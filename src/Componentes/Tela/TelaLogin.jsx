@@ -9,7 +9,7 @@ export default function TelaLogin(){
     function manipularSubmissao(evento){
         const usuarioDigitado = nomeUsuario.current.value;
         const senhaDigitada = senha.current.value;
-        if (usuarioDigitado === '123456' && senhaDigitada === 'admin'){
+        if (usuarioDigitado === '123456' && senhaDigitada === '123456'){
             setUsuario({
                 "usuario":usuarioDigitado,
                 "logado":true
