@@ -1,91 +1,45 @@
 import {Button, Spinner, Col, Form, InputGroup,Row} from 'react-bootstrap';
 import { useState, useEffect } from 'react';
-import { consultarUsuario } from '../../../Servicos/ServicosUsuario';
 import { gravarUsuario, alterarUsuario } from '../../../Servicos/ServicosUsuario';
-import toast, { Toaster } from 'react-hot-toast';
 
 export default function FormCadUsuario(props) {
     const [usuario, setUsuario] = useState(props.usuarioSelecionado);
     const [formValidado, setFormValidado] = useState(false);
-    const [categorias, setCategorias] = useState([]);
-    const [temCategorias, setTemCategorias] = useState(false);
 
-    useEffect(() => {
-        consultarCategoria().then((resultado) => {
-            if (Array.isArray(resultado)) {
-                setCategorias(resultado);
-                setTemCategorias(true);
-                toast.success("Categorias Carregadas com Sucesso!");
-            }
-            else {
-                toast.error("Não foi possível carregar as categorias");
-            }
-        }).catch((erro) => {
-            setTemCategorias(false);
-            toast.error("Não foi possível carregar as categorias");
-        });
-
-    }, []); //didMount
-    function selecionarCategoria(evento) {
-        setProduto({ ...produto, categoria: { codigo: evento.currentTarget.value } })
-
-    }
     function manipularSubmissao(evento) {
         const form = evento.currentTarget;
         if (form.checkValidity()) {
 
             if (!props.modoEdicao) {
-                //cadastrar o produto
-                gravarProduto(produto)
+                gravarUsuario(usuario)
                     .then((resultado) => {
                         if (resultado.status) {
                             props.setExibirTabela(true);
-                            toast.success("Produto Cadastrado!");
+                            props.success("Usuário Cadastrado!");
                         }
                         else {
-                            toast.error(resultado.mensagem);
+                            props.error(resultado.mensagem);
                         }
                     });
 
             }
             else {
-                //editar o produto
-                /*altera a ordem dos registros
-                props.setListaDeProdutos([...props.listaDeProdutos.filter(
-                    (item) => {
-                        return item.codigo !== produto.codigo;
-                    }
-                ), produto]);*/
-
-                //não altera a ordem dos registros
-                alterarProduto(produto)
+                alterarUsuario(usuario)
                     .then((resultado) => {
                         if (resultado.status) {
                             props.setModoEdicao(false);
-                            toast.success("Produto Alterado");
+                            props.success("Usuário Alterado");
                         }
                         else
-                            toast.error(resultado.mensagem);
+                            props.error(resultado.mensagem);
                     });
-                /*props.setListaDeProdutos(props.listaDeProdutos.map((item) => {
-                    if (item.codigo !== produto.codigo)
-                        return item
-                    else
-                        return produto
-                }));*/
-
-                //voltar para o modo de inclusão
-
             }
             props.setModoEdicao(false);
-            props.setProdutoSelecionado({
-                codigo: 0,
-                descricao: "",
-                precoCusto: 0,
-                precoVenda: 0,
-                qtdEstoque: 0,
-                urlImagem: "",
-                dataValidade: ""
+            props.setUsuarioSelecionado({
+                id: 0,
+                nickname: "",
+                urlAvatar: "",
+                dataIngresso: ""
             });
             props.setExibirTabela(true);
         }
@@ -100,94 +54,38 @@ export default function FormCadUsuario(props) {
     function manipularMudanca(evento) {
         const elemento = evento.target.name;
         const valor = evento.target.value;
-        setProduto({ ...produto, [elemento]: valor });
+        setUsuario({ ...usuario, [elemento]: valor });
     }
 
     return (
         <Form noValidate validated={formValidado} onSubmit={manipularSubmissao}>
             <Row className="mb-4">
                 <Form.Group as={Col} md="4">
-                    <Form.Label>Código</Form.Label>
+                    <Form.Label>Usuário</Form.Label>
                     <Form.Control
                         required
                         type="text"
-                        id="codigo"
-                        name="codigo"
-                        value={produto.codigo}
+                        id="id"
+                        name="id"
+                        value={usuario.id}
                         disabled
                         onChange={manipularMudanca}
                     />
-                    <Form.Control.Feedback type='invalid'>Por favor, informe o código do produto!</Form.Control.Feedback>
+                    <Form.Control.Feedback type='invalid'>Por favor, informe o id do usuario!</Form.Control.Feedback>
                 </Form.Group>
             </Row>
             <Row className="mb-4">
                 <Form.Group as={Col} md="12">
-                    <Form.Label>Descrição</Form.Label>
+                    <Form.Label>Nickname</Form.Label>
                     <Form.Control
                         required
                         type="text"
-                        id="descricao"
-                        name="descricao"
-                        value={produto.descricao}
+                        id="nickname"
+                        name="nickname"
+                        value={usuario.nickname}
                         onChange={manipularMudanca}
                     />
-                    <Form.Control.Feedback type="invalid">Por favor, informe a descrição do produto!</Form.Control.Feedback>
-                </Form.Group>
-            </Row>
-            <Row className="mb-4">
-                <Form.Group as={Col} md="4">
-                    <Form.Label>Preço de Custo:</Form.Label>
-                    <InputGroup hasValidation>
-                        <InputGroup.Text id="precoCusto">R$</InputGroup.Text>
-                        <Form.Control
-                            type="text"
-                            id="precoCusto"
-                            name="precoCusto"
-                            aria-describedby="precoCusto"
-                            value={produto.precoCusto}
-                            onChange={manipularMudanca}
-                            required
-                        />
-                        <Form.Control.Feedback type="invalid">
-                            Por favor, informe o preço de custo!
-                        </Form.Control.Feedback>
-                    </InputGroup>
-                </Form.Group>
-                <Form.Group as={Col} md="4">
-                    <Form.Label>Preço de Venda:</Form.Label>
-                    <InputGroup hasValidation>
-                        <InputGroup.Text id="precoVenda">R$</InputGroup.Text>
-                        <Form.Control
-                            type="text"
-                            id="precoVenda"
-                            name="precoVenda"
-                            aria-describedby="precoVenda"
-                            value={produto.precoVenda}
-                            onChange={manipularMudanca}
-                            required
-                        />
-                        <Form.Control.Feedback type="invalid">
-                            Por favor, informe o preço de venda!
-                        </Form.Control.Feedback>
-                    </InputGroup>
-                </Form.Group>
-                <Form.Group as={Col} md="4">
-                    <Form.Label>Qtd em estoque:</Form.Label>
-                    <InputGroup hasValidation>
-                        <InputGroup.Text id="qtdEstoque">+</InputGroup.Text>
-                        <Form.Control
-                            type="text"
-                            id="qtdEstoque"
-                            name="qtdEstoque"
-                            aria-describedby="qtdEstoque"
-                            value={produto.qtdEstoque}
-                            onChange={manipularMudanca}
-                            required
-                        />
-                        <Form.Control.Feedback type="invalid">
-                            Por favor, informe a quantidade em estoque!
-                        </Form.Control.Feedback>
-                    </InputGroup>
+                    <Form.Control.Feedback type="invalid">Por favor, informe o nome do usuário!</Form.Control.Feedback>
                 </Form.Group>
             </Row>
             <Row className="mb-4">
@@ -198,56 +96,31 @@ export default function FormCadUsuario(props) {
                         type="text"
                         id="urlImagem"
                         name="urlImagem"
-                        value={produto.urlImagem}
+                        value={usuario.urlAvatar}
                         onChange={manipularMudanca}
                     />
-                    <Form.Control.Feedback type="invalid">Por favor, informe a url da imagem do produto!</Form.Control.Feedback>
+                    <Form.Control.Feedback type="invalid">Por favor, informe a url da imagem!</Form.Control.Feedback>
                 </Form.Group>
             </Row>
             <Row className="mb-4">
                 <Form.Group as={Col} md="4">
-                    <Form.Label>Válido até:</Form.Label>
+                    <Form.Label>Data: </Form.Label>
                     <Form.Control
                         required
                         type="text"
-                        id="dataValidade"
-                        name="dataValidade"
-                        value={produto.dataValidade}
+                        id="dataIngresso"
+                        name="dataIngresso"
+                        value={usuario.dataIngresso}
                         onChange={manipularMudanca}
                     />
-                    <Form.Control.Feedback type="invalid">Por favor, informe a data de validade do produto!</Form.Control.Feedback>
+                    <Form.Control.Feedback type="invalid">Por favor, informe a data!</Form.Control.Feedback>
                 </Form.Group>
-                <Form.Group as={Col} md={7}>
-                    <Form.Label>Categoria:</Form.Label>
-                    <Form.Select id='categoria' name='categoria' onChange={selecionarCategoria}>
-                        {// criar em tempo de execução as categorias existentes no banco de dados
-                            categorias.map((categoria) => {
-                                return <option value={categoria.codigo}>
-                                    {categoria.descricao}
-                                </option>
-                            })
-                        }
-
-                    </Form.Select>
-                </Form.Group>
-                <Form.Group as={Col} md={1}>
-                    {
-                        !temCategorias ? <Spinner className='mt-4' animation="border" variant="success" />
-                            : ""
-                    }
-                </Form.Group>
-            </Row>
-            <Row className='mt-2 mb-2'>
-                <Col md={1}>
-                    <Button type="submit" disabled={!temCategorias}>{props.modoEdicao ? "Alterar" : "Confirmar"}</Button>
-                </Col>
                 <Col md={{ offset: 1 }}>
                     <Button onClick={() => {
                         props.setExibirTabela(true);
                     }}>Voltar</Button>
                 </Col>
             </Row>
-            <Toaster position="top-right" />
         </Form>
 
     );

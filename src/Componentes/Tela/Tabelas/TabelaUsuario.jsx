@@ -1,12 +1,11 @@
 import { Button, Container, Table } from "react-bootstrap";
 import { excluirUsuario } from "../../../Servicos/ServicosUsuario";
-import toast, {Toaster} from "react-hot-toast"
 
 export default function TabelaUsuario(props) {
 
-    function editarProduto(usuario){
+    function editarUsuario(usuario){
         props.setModoEdicao(true);
-        props.setProdutoSelecionado(usuario)
+        props.setUsuarioSelecionado(usuario)
         props.setExibirTabela(false);
     }
 
@@ -15,13 +14,13 @@ export default function TabelaUsuario(props) {
            excluirUsuario(usuario)
            .then((resultado)=>{
                 if(resultado.status){
-                    props.setListaUsuario(props.listaUsuario.filter((item)=>{
+                    props.setListaDeUsuarios(props.listaDeUsuarios.filter((item)=>{
                                                                                   
                         return item.codigo != usuario.codigo;
                     }));
                 }
                 else
-                    toast.error(resultado.mensagem);
+                    props.error(resultado.mensagem);
            })
         }
     }
@@ -36,35 +35,26 @@ export default function TabelaUsuario(props) {
                 >Adicionar</Button>
                 <Table striped bordered hover>
                     <thead>
-                        <th>Código</th>
-                        <th>Descrição</th>
-                        <th>Preço de custo</th>
-                        <th>Preço de venda</th>
-                        <th>Qtd. em estoque</th>
-                        <th>Imagem</th>
-                        <th>Validade</th>
-                        <th>Categoria</th>
-                        <th>Ações</th>
+                        <th>Id</th>
+                        <th>Nickname</th>
+                        <th>urlAvatar</th>
+                        <th>dataIngresso</th>
                     </thead>
                     <tbody>
                         {
-                            props?.listaDeProdutos?.map((produto) => {
+                            props?.listaDeUsuarios?.map((usuario) => {
                                 return (
                                     <tr>
-                                        <td>{produto.codigo}</td>
-                                        <td>{produto.descricao}</td>
-                                        <td>{produto.precoCusto}</td>
-                                        <td>{produto.precoVenda}</td>
-                                        <td>{produto.qtdEstoque}</td>
+                                        <td>{usuario.id}</td>
+                                        <td>{usuario.nickname}</td>
                                         <td><img style={{
                                                           "width":"40px",
                                                           "height":"40px"
-                                                        }} src={produto.urlImagem} alt="foto do produto" /></td>
-                                        <td>{new Date(produto.dataValidade).toLocaleDateString()}</td>
-                                        <td>{produto.categoria.descricao}</td>
+                                                        }} src={usuario.urlImagem} alt="foto do usuário" /></td>
+                                        <td>{new Date(usuario.data).toLocaleDateString()}</td>
                                         <td>
                                             <Button onClick={()=>{
-                                                editarProduto(produto);
+                                                editarUsuario(usuario);
                                             }}variant="warning">
                                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-pencil-square" viewBox="0 0 16 16">
                                                     <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
@@ -72,7 +62,7 @@ export default function TabelaUsuario(props) {
                                                 </svg>
                                             </Button>
                                             <Button onClick={ ()=> {
-                                                excluirUsuarioSelecionado(produto);
+                                                excluirUsuarioSelecionado(usuario);
                                             }} variant="danger">
                                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-trash" viewBox="0 0 16 16">
                                                     <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z"/>
@@ -86,8 +76,6 @@ export default function TabelaUsuario(props) {
                         }
                     </tbody>
                 </Table>
-                <p>Quatidade de produtos cadastrados: {props.listaDeProdutos.length}</p>
-                <Toaster position="top-right"/>
             </Container>
         </>
     );
